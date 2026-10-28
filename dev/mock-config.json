@@ -1,0 +1,8 @@
+{
+  "_說明": "僅供本機測試伺服器（dev/server.js）使用的指令碼屬性；正式環境請在 Apps Script「專案設定 → 指令碼屬性」另外設定，不要沿用這組。",
+  "scriptProperties": {
+    "REGISTER_CODE": "test",
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "test1234"
+  }
+}

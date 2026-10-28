@@ -1,0 +1,31 @@
+// ============================================================
+// 網站設定：部署到 GitHub Pages 後，通常只需要改這個檔案
+// ============================================================
+
+// Apps Script「部署 → 網頁應用程式」取得的 /exec 網址（見 部署說明.txt）
+const PROD_API_URL = 'https://script.google.com/macros/s/AKfycbyNZnhlKR0wF2sZXWGZESog7gBsXkZ_xlFOZNzXvqW3IsMBsQDaUuHvL-J2Xk0wYJ5pCA/exec';
+
+// 在本機（localhost）開啟時改用 dev/server.js 的模擬後端，不會動到正式資料
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+const API_URL = IS_LOCAL ? '/api' : PROD_API_URL;
+
+// 圖鑑類別（順序＝畫面上的順序）。要加類別就加一行；
+// 改名或刪除類別不會動到舊資料，舊資料會以原本的類別名稱另外列出。
+const CATEGORIES = [
+    { name: '食靈', icon: '🧚' },
+    { name: '時裝', icon: '👗' },
+    { name: '卡牌', icon: '🃏' },
+    { name: '作物', icon: '🌱' },
+    { name: '養殖', icon: '🐔' },
+    { name: '海產', icon: '🐟' },
+    { name: '食材', icon: '🧺' },
+    { name: '料理', icon: '🍲' },
+    { name: '裝飾', icon: '🏡' },
+    { name: '其他', icon: '📦' }
+];
+
+// 「來源」欄位的建議選項（仍可自由輸入；資料裡用過的來源也會自動列入建議）
+const SOURCE_SUGGESTIONS = ['活動', '商店', '禮包', '時裝禮包', '版本更新', '任務', '等級解鎖', '公會', '兌換碼'];
+
+// 登入狀態存在瀏覽器的 key
+const SESSION_KEY = 'jieyou_session';

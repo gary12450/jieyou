@@ -1,0 +1,5 @@
+# 本機測試伺服器產生的模擬資料
+dev/mock-db.json
+
+# Claude Code 本機預覽設定
+.claude/

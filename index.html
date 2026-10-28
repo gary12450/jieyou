@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解憂夢幻島 公會</title>
+    <meta name="description" content="解憂夢幻島公會成員、圖鑑與公會競賽登記">
+    <link rel="icon" type="image/svg+xml" href="assets/icon-small.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+
+    <header class="header">
+        <div class="brand">
+            <img src="assets/icon.svg" alt="" class="brand-icon">
+            <div>
+                <h1>解憂夢幻島</h1>
+                <div class="brand-sub">公會成員・圖鑑・競賽登記</div>
+            </div>
+        </div>
+        <div id="auth-area" class="auth-area"></div>
+    </header>
+
+    <div id="config-notice" class="notice hidden"></div>
+
+    <nav class="tabs" role="tablist">
+        <button class="tab active" data-act="tab" data-id="members" role="tab">👥 成員清單</button>
+        <button class="tab" data-act="tab" data-id="items" role="tab">📖 圖鑑</button>
+        <button class="tab" data-act="tab" data-id="competitions" role="tab">🏆 公會競賽</button>
+    </nav>
+
+    <div id="summary-bar" class="summary-bar"></div>
+
+    <!-- 成員清單 -->
+    <section id="tab-members" class="content active">
+        <div id="guild-panel" class="panel guild-panel hidden">
+            <div class="panel-title">🏝️ 公會管理（僅管理員可見）</div>
+            <form class="panel-row" data-form="guild-add">
+                <input type="text" id="new-guild-name" placeholder="輸入新公會名稱" maxlength="30" required>
+                <button type="submit" class="btn btn-primary btn-sm">新增</button>
+            </form>
+            <div id="guild-list" class="tags"></div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="members-search" class="search-input" placeholder="搜尋遊戲名稱或遊戲ID…" data-input="members">
+            </div>
+            <select id="members-guild" class="select" data-change="members"></select>
+            <button class="btn btn-primary" data-act="member-add">＋ 新增成員</button>
+        </div>
+        <div class="table-card"><div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>遊戲名稱</th>
+                        <th>遊戲ID</th>
+                        <th>公會</th>
+                        <th>島嶼等級</th>
+                        <th class="center">擁有</th>
+                        <th>備註</th>
+                        <th>建立者</th>
+                        <th class="center">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="members-table"></tbody>
+            </table>
+        </div></div>
+    </section>
+
+    <!-- 圖鑑 -->
+    <section id="tab-items" class="content">
+        <div id="item-cats" class="chip-row"></div>
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="items-search" class="search-input" placeholder="搜尋名稱、來源、備註…" data-input="items">
+            </div>
+            <select id="items-sort" class="select" data-change="items">
+                <option value="category">依類別排序</option>
+                <option value="release">上市日期（新→舊）</option>
+                <option value="owners">擁有人數（多→少）</option>
+                <option value="updated">最近更新</option>
+            </select>
+            <button class="btn btn-primary" data-act="item-add">＋ 新增圖鑑項目</button>
+        </div>
+        <div class="table-card"><div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>名稱</th>
+                        <th>類別</th>
+                        <th>稀有度</th>
+                        <th>解鎖等級</th>
+                        <th>來源</th>
+                        <th>上市日期</th>
+                        <th class="center">誰擁有</th>
+                        <th>備註</th>
+                        <th class="center">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="items-table"></tbody>
+            </table>
+        </div></div>
+    </section>
+
+    <!-- 公會競賽 -->
+    <section id="tab-competitions" class="content">
+        <div class="toolbar">
+            <select id="comp-period" class="select" data-change="competitions" aria-label="期別"></select>
+            <select id="comp-guild" class="select" data-change="competitions" aria-label="公會"></select>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="comp-search" class="search-input" placeholder="搜尋成員或參賽項目…" data-input="competitions">
+            </div>
+            <button class="btn btn-primary" data-act="comp-add">＋ 登記競賽</button>
+        </div>
+        <div class="table-card"><div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>期別</th>
+                        <th>成員</th>
+                        <th>公會</th>
+                        <th>參賽項目</th>
+                        <th class="num">分數</th>
+                        <th>備註</th>
+                        <th class="center">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="competitions-table"></tbody>
+            </table>
+        </div></div>
+    </section>
+
+    <footer>
+        資料由公會成員自行建立與維護・遊戲內容以遊戲內實際顯示為準<br>
+        本站為玩家自製，與遊戲官方無關
+    </footer>
+</div>
+
+<!-- 通用 Modal（詳細資料／表單） -->
+<div id="modal" class="modal" data-act="modal-backdrop">
+    <div id="modal-content" class="modal-content" role="dialog" aria-modal="true">
+        <button class="modal-close" data-act="modal-close" aria-label="關閉">×</button>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<!-- 全頁 loading -->
+<div id="loading" class="loading-overlay">
+    <div class="loading-box"><div class="loading-spinner"></div><span id="loading-text">處理中...</span></div>
+</div>
+
+<!-- 通知／確認對話框 -->
+<div id="dialog" class="dialog-overlay">
+    <div class="dialog-box" role="alertdialog" aria-modal="true">
+        <div id="dialog-msg" class="dialog-msg"></div>
+        <div id="dialog-buttons" class="dialog-buttons"></div>
+    </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/core.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/members.js"></script>
+<script src="js/items.js"></script>
+<script src="js/competitions.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

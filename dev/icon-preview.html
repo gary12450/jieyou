@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>圖示預覽</title>
+<style>
+    body { font-family: "Microsoft JhengHei", sans-serif; margin: 24px; background: #f5f5f5; color: #222; }
+    h2 { font-size: 16px; margin: 20px 0 8px; }
+    .row { display: flex; gap: 20px; align-items: flex-end; padding: 16px; border-radius: 10px; }
+    .light { background: #ffffff; }
+    .dark { background: #202124; color: #ddd; }
+    .cell { text-align: center; font-size: 12px; }
+    .cell img { display: block; margin: 0 auto 6px; }
+    .zoom canvas { display: block; margin: 0 auto 6px; width: 96px; height: 96px; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<p>上：完整版 icon.svg（網頁標題旁 48px 使用）　下：簡化加粗版 icon-small.svg（瀏覽器分頁 favicon 16～32px 使用）</p>
+<script>
+    const sizes = [16, 24, 32, 48, 64];
+    for (const [file, label] of [['../assets/icon.svg', '完整版'], ['../assets/icon-small.svg', '簡化版']]) {
+        for (const bg of ['light', 'dark']) {
+            document.write(`<h2>${label}・${bg === 'light' ? '亮底' : '暗底'}</h2><div class="row ${bg}">` +
+                sizes.map(s => `<div class="cell"><img src="${file}" width="${s}" height="${s}">${s}px</div>`).join('') +
+                `<div class="cell zoom"><canvas data-src="${file}" width="16" height="16"></canvas>16px 放大</div>` +
+                `<div class="cell zoom"><canvas data-src="${file}" width="24" height="24"></canvas>24px 放大</div></div>`);
+        }
+    }
+    // 先把 SVG 畫成真正的 16／24 px 點陣，再用 CSS 放大，才看得出小尺寸的實際效果
+    document.querySelectorAll('canvas[data-src]').forEach(c => {
+        const img = new Image();
+        img.onload = () => c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        img.src = c.dataset.src;
+    });
+</script>
+</body>
+</html>
