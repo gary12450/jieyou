@@ -9,7 +9,7 @@
 
   檔案：
     index.html、css\、js\、assets\   網站本體（上傳到 GitHub Pages）
-    js\config.js                       網站設定：後端網址、圖鑑類別、來源建議選項
+    js\config.js                       網站設定：後端網址、圖鑑類別、稀有度、來源選項
     backend\Code.gs                    後端程式（貼到 Apps Script）
     dev\                               本機測試用（模擬後端、自動測試），不需部署
 

@@ -120,6 +120,13 @@ ACTIONS['item-detail'] = id => {
         ${btns ? `<div class="modal-actions">${btns}</div>` : ''}`);
 };
 
+// 來源下拉選單：選項見 config.js 的 SOURCES；不在清單內的舊值另列一項並保持選取，存檔才不會被清掉
+function sourceSelectHtml(current) {
+    const opt = (value, label) => `<option value="${esc(value)}" ${value === (current || '') ? 'selected' : ''}>${esc(label)}</option>`;
+    const legacy = current && !SOURCES.includes(current) ? opt(current, current + '（舊選項）') : '';
+    return `<select name="source">${opt('', '未填')}${SOURCES.map(s => opt(s, s)).join('')}${legacy}</select>`;
+}
+
 function datalistHtml(id, values) {
     const uniq = Array.from(new Set(values.filter(Boolean))).sort(byText);
     return `<datalist id="${id}">${uniq.map(v => `<option value="${esc(v)}">`).join('')}</datalist>`;
@@ -142,8 +149,7 @@ function openItemForm(i) {
                 <div class="field"><label>解鎖等級</label>
                     <input type="text" name="unlockLevel" maxlength="10" inputmode="numeric" value="${esc(i ? i.unlockLevel : '')}"></div>
                 <div class="field"><label>來源</label>
-                    <input type="text" name="source" maxlength="40" list="dl-source" value="${esc(i ? i.source : '')}" placeholder="活動、商店、禮包…">
-                    ${datalistHtml('dl-source', SOURCE_SUGGESTIONS.concat(state.items.map(x => x.source)))}</div>
+                    ${sourceSelectHtml(i ? i.source : '')}</div>
                 <div class="field"><label>上市日期（台版）</label>
                     <input type="date" name="releaseDate" value="${esc(i ? i.releaseDate : '')}"></div>
                 <div class="field full"><label>備註</label>
