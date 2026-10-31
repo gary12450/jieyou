@@ -2,6 +2,26 @@
 
 function itemOwners(itemId) { return state.members.filter(m => m.ownedItems.includes(itemId)); }
 
+// ---------- 稀有度（五級，見 config.js 的 RARITIES） ----------
+
+function rarityInfo(name) { return RARITIES.find(r => r.name === name) || null; }
+// 越稀有數字越大；未填或不在清單內（舊資料）＝ -1
+function rarityRank(name) { return RARITIES.findIndex(r => r.name === name); }
+
+function rarityHtml(name) {
+    if (!name) return '';
+    const r = rarityInfo(name);
+    if (!r) return esc(name); // 改成五級前自由填寫的舊值，照原文字顯示
+    return `<span class="rarity" style="--r:${esc(r.color)}"><span class="rarity-dot">${esc(r.short)}</span>${esc(r.name)}</span>`;
+}
+
+function rarityPickerHtml(current) {
+    const opt = (value, inner, plain) => `<label><input type="radio" name="rarity" value="${esc(value)}" ${value === (current || '') ? 'checked' : ''}>
+        <span class="rarity-opt${plain ? ' plain' : ''}">${inner}</span></label>`;
+    const legacy = current && !rarityInfo(current) ? opt(current, esc(current), true) : '';
+    return `<div class="rarity-picker">${opt('', '未填', true)}${RARITIES.map(r => opt(r.name, rarityHtml(r.name))).join('')}${legacy}</div>`;
+}
+
 function categoryRank(cat) {
     const i = categoriesInUse().indexOf(cat);
     return i < 0 ? 999 : i;
@@ -27,6 +47,7 @@ function renderItemCats() {
 
 const ITEM_SORTS = {
     category: byCategoryThenName,
+    rarity: (a, b) => (rarityRank(b.rarity) - rarityRank(a.rarity)) || byCategoryThenName(a, b),
     release: (a, b) => byText(b.releaseDate, a.releaseDate) || byCategoryThenName(a, b),
     owners: (a, b) => (itemOwners(b.id).length - itemOwners(a.id).length) || byCategoryThenName(a, b),
     updated: (a, b) => byText(b.updatedAt, a.updatedAt)
@@ -55,7 +76,7 @@ function renderItems() {
         return `<tr>
             <td><button class="link" data-act="item-detail" data-id="${esc(i.id)}">${esc(i.name)}</button></td>
             <td><span class="cat-badge">${categoryIcon(i.category)} ${esc(i.category)}</span></td>
-            <td>${esc(i.rarity)}</td>
+            <td>${rarityHtml(i.rarity)}</td>
             <td>${esc(i.unlockLevel)}</td>
             <td>${esc(i.source)}</td>
             <td>${esc(i.releaseDate)}</td>
@@ -87,7 +108,7 @@ ACTIONS['item-detail'] = id => {
     ].join('');
     openModal(`
         <div class="modal-header"><div class="modal-subtitle">${categoryIcon(i.category)} ${esc(i.category)}</div><div class="modal-title">${esc(i.name)}</div></div>
-        ${detailRow('稀有度', i.rarity)}
+        ${detailRowHtml('稀有度', rarityHtml(i.rarity) || '—')}
         ${detailRow('解鎖等級', i.unlockLevel)}
         ${detailRow('來源', i.source)}
         ${detailRow('上市日期', i.releaseDate)}
@@ -117,9 +138,7 @@ function openItemForm(i) {
                     </select></div>
                 <div class="field"><label>名稱 <span class="req">*</span></label>
                     <input type="text" name="name" required maxlength="40" value="${esc(i ? i.name : '')}"></div>
-                <div class="field"><label>稀有度</label>
-                    <input type="text" name="rarity" maxlength="20" list="dl-rarity" value="${esc(i ? i.rarity : '')}" placeholder="依遊戲內標示填寫">
-                    ${datalistHtml('dl-rarity', state.items.map(x => x.rarity))}</div>
+                <div class="field full"><label>稀有度</label>${rarityPickerHtml(i ? i.rarity : '')}</div>
                 <div class="field"><label>解鎖等級</label>
                     <input type="text" name="unlockLevel" maxlength="10" inputmode="numeric" value="${esc(i ? i.unlockLevel : '')}"></div>
                 <div class="field"><label>來源</label>
@@ -134,7 +153,7 @@ function openItemForm(i) {
                 <button type="button" class="btn btn-ghost" data-act="modal-close">取消</button>
                 <button type="submit" class="btn btn-save">💾 儲存</button>
             </div>
-        </form>`);
+        </form>`, true); // 加寬：稀有度六個選項才排得下一行
 }
 
 ACTIONS['item-add'] = () => { if (requireLogin('新增圖鑑項目')) openItemForm(null); };
@@ -148,7 +167,7 @@ FORMS.item = async form => {
     const v = formValues(form);
     const id = form.dataset.id;
     const item = {
-        category: v.category, name: v.name.trim(), rarity: v.rarity.trim(), unlockLevel: v.unlockLevel.trim(),
+        category: v.category, name: v.name.trim(), rarity: (v.rarity || '').trim(), unlockLevel: v.unlockLevel.trim(),
         source: v.source.trim(), releaseDate: v.releaseDate, note: v.note.trim()
     };
     const r = await apiCall({ action: id ? 'updateItem' : 'addItem', type: 'items', id, item }, '儲存失敗');

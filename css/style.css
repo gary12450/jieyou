@@ -134,6 +134,23 @@ tbody tr:hover { background: #fbf7ee; }
 
 .cat-badge { display: inline-flex; gap: 3px; align-items: center; font-size: 13px; padding: 1px 8px; border-radius: 8px; background: var(--sand-deep); }
 
+/* 稀有度：仿遊戲內圓章（白字＋同色深描邊），底色由 config.js 的 RARITIES 以 --r 帶入 */
+.rarity {
+    --rd: color-mix(in srgb, var(--r) 62%, #000);
+    display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+    font-size: 14px; font-weight: 700; color: var(--ink); color: var(--rd);
+}
+.rarity-dot {
+    width: 24px; height: 24px; border-radius: 50%; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--r);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--r) 50%, #fff) 0%, var(--r) 72%);
+    box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--r) 82%, #000), 0 1px 2px rgba(36, 52, 60, 0.25);
+    color: #fff; font-size: 13px; font-weight: 800; line-height: 1;
+    text-shadow: 1px 0 0 var(--rd), -1px 0 0 var(--rd), 0 1px 0 var(--rd), 0 -1px 0 var(--rd),
+        1px 1px 0 var(--rd), -1px -1px 0 var(--rd), 1px -1px 0 var(--rd), -1px 1px 0 var(--rd);
+}
+
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 13px; background: #fff; border: 1px solid var(--line); }
 .tag.missing { color: #a3aeb3; border-style: dashed; }
@@ -186,6 +203,17 @@ td .tags { flex-wrap: nowrap; overflow: hidden; }
 .field input, .field select, .field textarea { padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; width: 100%; }
 .field textarea { resize: vertical; min-height: 64px; }
 .field .hint { font-size: 12px; color: var(--muted); }
+.rarity-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.rarity-picker label { position: relative; cursor: pointer; }
+.rarity-picker input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.rarity-opt {
+    display: inline-flex; align-items: center; min-height: 34px; padding: 4px 12px 4px 5px;
+    border: 1.5px solid var(--line); border-radius: 999px; background: #fff; font-size: 14px; color: var(--muted);
+}
+.rarity-opt.plain { padding-left: 12px; }
+.rarity-picker label:hover .rarity-opt { border-color: #bfe6e1; }
+.rarity-picker input:checked + .rarity-opt { border-color: var(--sea); background: var(--sea-soft); box-shadow: 0 0 0 1px var(--sea); }
+.rarity-picker input:focus-visible + .rarity-opt { outline: 2px solid var(--sea); outline-offset: 2px; }
 .form-buttons { display: flex; gap: 8px; margin-top: 16px; }
 .form-buttons .btn { flex: 1; }
 

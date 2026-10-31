@@ -24,6 +24,15 @@ const CATEGORIES = [
     { name: '其他', icon: '📦' }
 ];
 
+// 稀有度（由低到高）：name＝存進資料的值、short＝圓章上的字、color＝圓章底色（取自遊戲內圓章）
+const RARITIES = [
+    { name: '凡品', short: '凡', color: '#86cc45' },
+    { name: '普品', short: '普', color: '#62bdea' },
+    { name: '珍品', short: '珍', color: '#a175f4' },
+    { name: '華品', short: '華', color: '#f4a93a' },
+    { name: '仙品', short: '仙', color: '#e04443' }
+];
+
 // 「來源」欄位的建議選項（仍可自由輸入；資料裡用過的來源也會自動列入建議）
 const SOURCE_SUGGESTIONS = ['活動', '商店', '禮包', '時裝禮包', '版本更新', '任務', '等級解鎖', '公會', '兌換碼'];
 

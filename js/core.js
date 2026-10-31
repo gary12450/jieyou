@@ -167,7 +167,11 @@ ACTIONS['modal-backdrop'] = (id, el, ev) => { if (ev.target === el) closeModal()
 
 function detailRow(label, value) {
     const v = value === '' || value === undefined || value === null ? '—' : value;
-    return `<div class="detail-row"><span class="detail-label">${esc(label)}</span><span class="detail-value">${esc(v)}</span></div>`;
+    return detailRowHtml(label, esc(v));
+}
+// html 必須是已跳脫過的內容
+function detailRowHtml(label, html) {
+    return `<div class="detail-row"><span class="detail-label">${esc(label)}</span><span class="detail-value">${html}</span></div>`;
 }
 
 // ---------- 讀取：自動重試 ----------
