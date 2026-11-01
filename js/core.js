@@ -163,7 +163,10 @@ function closeModal() { $('modal').classList.remove('show'); }
 function isModalOpen() { return $('modal').classList.contains('show'); }
 
 ACTIONS['modal-close'] = () => closeModal();
-ACTIONS['modal-backdrop'] = (id, el, ev) => { if (ev.target === el) closeModal(); };
+// 點視窗外面：只有純檢視的視窗會關；有表單的不關，免得誤觸把填到一半的資料丟掉（要關按 × 或「取消」）
+ACTIONS['modal-backdrop'] = (id, el, ev) => {
+    if (ev.target === el && !$('modal-body').querySelector('form')) closeModal();
+};
 
 function detailRow(label, value) {
     const v = value === '' || value === undefined || value === null ? '—' : value;
