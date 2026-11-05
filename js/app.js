@@ -104,6 +104,7 @@ function init() {
         return;
     }
     loadData();
+    refreshSession();
 }
 
 init();

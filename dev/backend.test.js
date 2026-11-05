@@ -100,8 +100,8 @@ test('會員可新增圖鑑；同類別同名稱不可重複', () => {
 test('圖鑑「食材」欄接在稽核欄後面，舊資料欄位位置不變', () => {
   const t = boot();
   const header = t.db.sheets.items[0];
-  assert.deepEqual(header.slice(0, 15), ['id', 'category', 'name', 'rarity', 'unlockLevel', 'source', 'releaseDate', 'note',
-    'ownerId', 'createdAt', 'updatedAt', 'updatedBy', 'deletedAt', 'deletedBy', 'ingredients']);
+  assert.deepEqual(header.slice(0, 16), ['id', 'category', 'name', 'rarity', 'unlockLevel', 'source', 'releaseDate', 'note',
+    'ownerId', 'createdAt', 'updatedAt', 'updatedBy', 'deletedAt', 'deletedBy', 'ingredients', 'score']);
 
   // 改版前寫入的列沒有食材欄：照樣讀得到，食材為空
   const before = t.get().items[0];
@@ -118,6 +118,48 @@ test('圖鑑「食材」欄接在稽核欄後面，舊資料欄位位置不變',
   assert.equal(row[8], 'testA');
   assert.equal(t.get().items.find(x => x.id === r.record.id).ingredients, '測試食材');
   assert.match(t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試二', ingredients: 'x'.repeat(201) } }).error, /食材最多 200 字/);
+});
+
+test('圖鑑「競賽分數」只收 0 以上整數，存在食材欄後面', () => {
+  const t = boot();
+  const a = t.register('testA', 'test1234');
+  const r = t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試稻米', score: '28' } });
+  assert.ok(r.success, r.error);
+  assert.equal(r.record.score, '28');
+  const row = t.db.sheets.items.find(x => String(x[0]) === r.record.id);
+  assert.equal(String(row[15]), '28');
+  assert.equal(t.get().items.find(x => x.id === r.record.id).score, '28');
+  ['abc', '-5', '2.5'].forEach(bad => {
+    assert.match(t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試' + bad, score: bad } }).error, /競賽分數只能填 0 以上的整數/);
+  });
+  assert.ok(t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試無分數' } }).success);
+});
+
+test('修改時前端沒送的欄位沿用舊值（舊版網頁存檔不會清掉新欄位）', () => {
+  const t = boot();
+  const a = t.register('testA', 'test1234');
+  const r = t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試稻米', score: '28', ingredients: '測試食材' } });
+  const id = r.record.id;
+  // 舊版前端：表單沒有 score、ingredients
+  const u = t.post({ action: 'updateItem', token: a, type: 'items', id, item: { category: '作物', name: '測試稻米', note: '改備註' } });
+  assert.ok(u.success, u.error);
+  const got = t.get().items.find(x => x.id === id);
+  assert.equal(got.score, '28');
+  assert.equal(got.ingredients, '測試食材');
+  assert.equal(got.note, '改備註');
+  // 有送空字串＝真的要清掉
+  assert.ok(t.post({ action: 'updateItem', token: a, type: 'items', id, item: { category: '作物', name: '測試稻米', score: '' } }).success);
+  assert.equal(t.get().items.find(x => x.id === id).score, '');
+});
+
+test('me 回傳目前角色：被設為二級管理者後不用重新登入', () => {
+  const t = boot();
+  const admin = t.login('admin', 'test1234');
+  const a = t.register('testA', 'test1234');
+  assert.equal(t.post({ action: 'me', token: a }).role, 'user');
+  assert.ok(t.post({ action: 'setRole', token: admin, username: 'testA', role: 'admin2' }).success);
+  assert.equal(t.post({ action: 'me', token: a }).role, 'admin2');
+  assert.equal(t.post({ action: 'me', token: 'bad' }).authExpired, true);
 });
 
 test('遊戲ID 不可重複、公會必須存在', () => {

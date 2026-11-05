@@ -49,11 +49,12 @@ function renderMembers() {
     }).join('');
 }
 
-// 依類別分組顯示擁有的項目
+// 依類別分組顯示擁有的項目；同類別內競賽分數高的排前面，同分依名稱
 function ownedByCategoryHtml(items) {
     if (!items.length) return '<div class="muted">尚未勾選任何項目</div>';
     return categoriesInUse().map(cat => {
-        const names = items.filter(i => i.category === cat).map(i => i.name).sort(byText);
+        const names = items.filter(i => i.category === cat)
+            .sort((a, b) => (scoreNum(b) - scoreNum(a)) || byText(a.name, b.name)).map(i => i.name);
         if (!names.length) return '';
         return `<div class="section-title">${categoryIcon(cat)} ${esc(cat)}（${names.length}）</div>${tagsHtml(names)}`;
     }).join('');

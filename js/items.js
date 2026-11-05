@@ -22,6 +22,12 @@ function rarityPickerHtml(current) {
     return `<div class="rarity-picker">${opt('', '未填', true)}${RARITIES.map(r => opt(r.name, rarityHtml(r.name))).join('')}${legacy}</div>`;
 }
 
+// 競賽分數：未填（或不是數字）＝ -1，排在有分數的後面
+function scoreNum(i) {
+    const n = parseInt(i.score, 10);
+    return isNaN(n) ? -1 : n;
+}
+
 function categoryRank(cat) {
     const i = categoriesInUse().indexOf(cat);
     return i < 0 ? 999 : i;
@@ -48,6 +54,7 @@ function renderItemCats() {
 const ITEM_SORTS = {
     category: byCategoryThenName,
     rarity: (a, b) => (rarityRank(b.rarity) - rarityRank(a.rarity)) || byCategoryThenName(a, b),
+    score: (a, b) => (scoreNum(b) - scoreNum(a)) || byCategoryThenName(a, b),
     release: (a, b) => byText(b.releaseDate, a.releaseDate) || byCategoryThenName(a, b),
     owners: (a, b) => (itemOwners(b.id).length - itemOwners(a.id).length) || byCategoryThenName(a, b),
     updated: (a, b) => byText(b.updatedAt, a.updatedAt)
@@ -65,7 +72,7 @@ function filteredItems() {
 function renderItems() {
     const list = filteredItems();
     if (list.length === 0) {
-        $('items-table').innerHTML = emptyRow(9, state.items.length ? '找不到符合條件的項目' : '圖鑑還是空的，按「＋ 新增圖鑑項目」開始建立');
+        $('items-table').innerHTML = emptyRow(10, state.items.length ? '找不到符合條件的項目' : '圖鑑還是空的，按「＋ 新增圖鑑項目」開始建立');
         return;
     }
     $('items-table').innerHTML = list.map(i => {
@@ -76,6 +83,7 @@ function renderItems() {
             <td><button class="link" data-act="item-detail" data-id="${esc(i.id)}">${esc(i.name)}</button></td>
             <td><span class="cat-badge">${categoryIcon(i.category)} ${esc(i.category)}</span></td>
             <td>${rarityHtml(i.rarity)}</td>
+            <td class="num">${esc(i.score)}</td>
             <td>${esc(i.unlockLevel)}</td>
             <td>${esc(i.source)}</td>
             <td>${esc(i.releaseDate)}</td>
@@ -108,6 +116,7 @@ ACTIONS['item-detail'] = id => {
     openModal(`
         <div class="modal-header"><div class="modal-subtitle">${categoryIcon(i.category)} ${esc(i.category)}</div><div class="modal-title">${esc(i.name)}</div></div>
         ${detailRowHtml('稀有度', rarityHtml(i.rarity) || '—')}
+        ${detailRow('競賽分數', i.score)}
         ${detailRow('解鎖等級', i.unlockLevel)}
         ${detailRow('來源', i.source)}
         ${detailRow('上市日期', i.releaseDate)}
@@ -120,11 +129,11 @@ ACTIONS['item-detail'] = id => {
         ${btns ? `<div class="modal-actions">${btns}</div>` : ''}`);
 };
 
-// 來源下拉選單：選項見 config.js 的 SOURCES；不在清單內的舊值另列一項並保持選取，存檔才不會被清掉
-function sourceSelectHtml(current) {
+// 固定選項的下拉選單（來源、競賽分數，選項見 config.js）；不在清單內的舊值另列一項並保持選取，存檔才不會被清掉
+function fixedSelectHtml(name, options, current) {
     const opt = (value, label) => `<option value="${esc(value)}" ${value === (current || '') ? 'selected' : ''}>${esc(label)}</option>`;
-    const legacy = current && !SOURCES.includes(current) ? opt(current, current + '（舊選項）') : '';
-    return `<select name="source">${opt('', '未填')}${SOURCES.map(s => opt(s, s)).join('')}${legacy}</select>`;
+    const legacy = current && !options.includes(current) ? opt(current, current + '（舊選項）') : '';
+    return `<select name="${esc(name)}">${opt('', '未填')}${options.map(s => opt(s, s)).join('')}${legacy}</select>`;
 }
 
 function openItemForm(i) {
@@ -144,11 +153,13 @@ function openItemForm(i) {
                 <div class="field"><label>解鎖等級</label>
                     <input type="text" name="unlockLevel" maxlength="10" inputmode="numeric" value="${esc(i ? i.unlockLevel : '')}"></div>
                 <div class="field"><label>來源</label>
-                    ${sourceSelectHtml(i ? i.source : '')}</div>
+                    ${fixedSelectHtml('source', SOURCES, i ? i.source : '')}</div>
                 <div class="field"><label>上市日期（台版）</label>
                     <input type="date" name="releaseDate" value="${esc(i ? i.releaseDate : '')}"></div>
                 <div class="field"><label>食材</label>
                     <input type="text" name="ingredients" maxlength="200" value="${esc(i ? i.ingredients : '')}"></div>
+                <div class="field"><label>競賽分數</label>
+                    ${fixedSelectHtml('score', SCORES, i ? i.score : '')}</div>
                 <div class="field full"><label>備註</label>
                     <textarea name="note" maxlength="300" placeholder="取得方式、用途、配方…">${esc(i ? i.note : '')}</textarea></div>
             </div>
@@ -171,7 +182,8 @@ FORMS.item = async form => {
     const id = form.dataset.id;
     const item = {
         category: v.category, name: v.name.trim(), rarity: (v.rarity || '').trim(), unlockLevel: v.unlockLevel.trim(),
-        source: v.source.trim(), releaseDate: v.releaseDate, ingredients: v.ingredients.trim(), note: v.note.trim()
+        source: v.source.trim(), releaseDate: v.releaseDate, ingredients: v.ingredients.trim(), score: v.score,
+        note: v.note.trim()
     };
     const r = await apiCall({ action: id ? 'updateItem' : 'addItem', type: 'items', id, item }, '儲存失敗');
     if (!r) return;

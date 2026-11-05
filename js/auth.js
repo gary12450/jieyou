@@ -38,6 +38,23 @@ function onAuthExpired() {
     renderAll();
 }
 
+// 角色是登入時記在瀏覽器的；被設為／降為二級管理者後，開網頁時向後端重新確認，不必登出再登入。
+// 連線失敗就沿用原本的角色，不打擾使用者（真正寫入時後端仍會檢查權限）
+async function refreshSession() {
+    if (!isAuthed()) return;
+    const token = session.token;
+    const r = await fetchOnce(API_URL, { method: 'POST', body: JSON.stringify({ action: 'me', token }) }, FETCH_TIMEOUT_MS);
+    if (!r.data || !session || session.token !== token) return;
+    if (r.data.authExpired) {
+        onAuthExpired();
+        return;
+    }
+    if (r.data.success && r.data.role && r.data.role !== session.role) {
+        saveSession(Object.assign({}, session, { role: r.data.role }));
+        renderAll();
+    }
+}
+
 function renderAuthUI() {
     const area = $('auth-area');
     if (!isAuthed()) {

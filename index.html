@@ -6,7 +6,7 @@
     <title>海邊走走 — 解憂夢幻島</title>
     <meta name="description" content="海邊走走公會（解憂夢幻島）成員、圖鑑與公會競賽登記">
     <link rel="icon" type="image/svg+xml" href="assets/icon-small.svg">
-    <link rel="stylesheet" href="css/style.css?v=20261105">
+    <link rel="stylesheet" href="css/style.css?v=20261105b">
 </head>
 <body>
 <div class="container">
@@ -81,6 +81,7 @@
             <select id="items-sort" class="select" data-change="items">
                 <option value="category">依類別排序</option>
                 <option value="rarity">稀有度（仙→凡）</option>
+                <option value="score">競賽分數（高→低）</option>
                 <option value="release">上市日期（新→舊）</option>
                 <option value="owners">擁有人數（多→少）</option>
                 <option value="updated">最近更新</option>
@@ -94,6 +95,7 @@
                         <th>名稱</th>
                         <th>類別</th>
                         <th>稀有度</th>
+                        <th class="num">競賽分數</th>
                         <th>解鎖等級</th>
                         <th>來源</th>
                         <th>上市日期</th>
@@ -123,6 +125,7 @@
                 <thead>
                     <tr>
                         <th>品項</th>
+                        <th class="num">分數</th>
                         <th class="center">人數</th>
                         <th>人名</th>
                     </tr>
@@ -160,12 +163,12 @@
 </div>
 
 <!-- ?v＝版本號：改了 css/js 就一起換新，避免瀏覽器混用新舊快取 -->
-<script src="js/config.js?v=20261105"></script>
-<script src="js/core.js?v=20261105"></script>
-<script src="js/auth.js?v=20261105"></script>
-<script src="js/members.js?v=20261105"></script>
-<script src="js/items.js?v=20261105"></script>
-<script src="js/competitions.js?v=20261105"></script>
-<script src="js/app.js?v=20261105"></script>
+<script src="js/config.js?v=20261105b"></script>
+<script src="js/core.js?v=20261105b"></script>
+<script src="js/auth.js?v=20261105b"></script>
+<script src="js/members.js?v=20261105b"></script>
+<script src="js/items.js?v=20261105b"></script>
+<script src="js/competitions.js?v=20261105b"></script>
+<script src="js/app.js?v=20261105b"></script>
 </body>
 </html>

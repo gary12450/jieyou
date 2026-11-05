@@ -23,8 +23,8 @@
 
 const AUDIT = ['ownerId', 'createdAt', 'updatedAt', 'updatedBy', 'deletedAt', 'deletedBy'];
 
-// 各資料表可由前端寫入的欄位：max＝字數上限、req＝必填、list＝id 陣列（以 JSON 字串存放）
-// added＝上線後才加的欄位：接在試算表最後面（稽核欄之後），舊資料的欄位位置才不會跑掉
+// 各資料表可由前端寫入的欄位：max＝字數上限、req＝必填、int＝只能填 0 以上的整數、list＝id 陣列（以 JSON 字串存放）
+// added＝上線後才加的欄位：接在試算表最後面（稽核欄之後），舊資料的欄位位置才不會跑掉；之後再加也只能往最後面加
 const FIELDS = {
   members: [
     { k: 'gameName', max: 30, req: true },
@@ -42,7 +42,8 @@ const FIELDS = {
     { k: 'source', max: 40 },
     { k: 'releaseDate', max: 20 },
     { k: 'note', max: 300 },
-    { k: 'ingredients', max: 200, added: true }
+    { k: 'ingredients', max: 200, added: true },
+    { k: 'score', max: 10, int: true, added: true }
   ],
   competitions: [
     { k: 'period', max: 30, req: true },
@@ -56,7 +57,7 @@ const FIELDS = {
 const LABELS = {
   gameName: '遊戲名稱', gameId: '遊戲ID', guild: '公會', islandLevel: '島嶼等級', note: '備註',
   category: '類別', name: '名稱', rarity: '稀有度', unlockLevel: '解鎖等級', source: '來源',
-  releaseDate: '上市日期', period: '期別', memberId: '成員', score: '分數', ownedItems: '擁有項目',
+  releaseDate: '上市日期', period: '期別', memberId: '成員', score: '競賽分數', ownedItems: '擁有項目',
   selectedItems: '參賽項目', ingredients: '食材'
 };
 
@@ -305,6 +306,11 @@ function setRole_(body, user) {
   return { success: true };
 }
 
+// 回傳登入者目前的角色：被升降級後，前端開網頁時用這個更新，不必登出再登入
+function me_(body, user) {
+  return { success: true, username: user.username, role: user.role };
+}
+
 function listUsers_() {
   const users = rows_('users').map(function (x) {
     return { username: str_(x.o.username), role: str_(x.o.role), createdAt: str_(x.o.createdAt) };
@@ -314,11 +320,13 @@ function listUsers_() {
 
 // ---------- 寫入：members / items / competitions ----------
 
-function clean_(type, item) {
+// old＝修改前的那一列：前端沒送的欄位沿用舊值（開著舊版網頁的人存檔，才不會清掉之後新增欄位的內容）
+function clean_(type, item, old) {
   const values = {};
   for (let i = 0; i < FIELDS[type].length; i++) {
     const f = FIELDS[type][i];
-    const raw = item ? item[f.k] : undefined;
+    const sent = item && own_(item, f.k);
+    const raw = sent ? item[f.k] : (old ? (f.list ? parseList_(old[f.k]) : str_(old[f.k])) : undefined);
     if (f.list) {
       const ids = parseList_(raw === undefined || raw === null ? [] : raw)
         .map(function (v) { return String(v).trim(); })
@@ -329,6 +337,7 @@ function clean_(type, item) {
       const v = raw === undefined || raw === null ? '' : String(raw).trim();
       if (f.req && v === '') return { error: LABELS[f.k] + '必填' };
       if (v.length > f.max) return { error: LABELS[f.k] + '最多 ' + f.max + ' 字' };
+      if (f.int && v !== '' && !/^\d+$/.test(v)) return { error: LABELS[f.k] + '只能填 0 以上的整數' };
       values[f.k] = v;
     }
   }
@@ -394,7 +403,7 @@ function updateItem_(body, user) {
   const found = findAlive_(type, body.id);
   if (!found) return fail_('找不到資料（可能已被刪除）');
   if (!canEdit_(user, found.o)) return fail_('只能修改自己建立的資料');
-  const c = clean_(type, body.item);
+  const c = clean_(type, body.item, found.o);
   if (c.error) return fail_(c.error);
   const conflict = conflict_(type, c.values, found.o.id);
   if (conflict) return fail_(conflict);
@@ -497,6 +506,7 @@ const ACTIONS = {
   updateItem: { fn: updateItem_ },
   deleteItem: { fn: deleteItem_ },
   changePassword: { fn: changePassword_ },
+  me: { fn: me_ },
   setItemOwners: { manager: true, fn: setItemOwners_ },
   addGuild: { manager: true, fn: addGuild_ },
   deleteGuild: { manager: true, fn: deleteGuild_ },
