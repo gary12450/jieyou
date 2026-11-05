@@ -24,6 +24,7 @@
 const AUDIT = ['ownerId', 'createdAt', 'updatedAt', 'updatedBy', 'deletedAt', 'deletedBy'];
 
 // 各資料表可由前端寫入的欄位：max＝字數上限、req＝必填、list＝id 陣列（以 JSON 字串存放）
+// added＝上線後才加的欄位：接在試算表最後面（稽核欄之後），舊資料的欄位位置才不會跑掉
 const FIELDS = {
   members: [
     { k: 'gameName', max: 30, req: true },
@@ -40,7 +41,8 @@ const FIELDS = {
     { k: 'unlockLevel', max: 10 },
     { k: 'source', max: 40 },
     { k: 'releaseDate', max: 20 },
-    { k: 'note', max: 300 }
+    { k: 'note', max: 300 },
+    { k: 'ingredients', max: 200, added: true }
   ],
   competitions: [
     { k: 'period', max: 30, req: true },
@@ -55,13 +57,21 @@ const LABELS = {
   gameName: '遊戲名稱', gameId: '遊戲ID', guild: '公會', islandLevel: '島嶼等級', note: '備註',
   category: '類別', name: '名稱', rarity: '稀有度', unlockLevel: '解鎖等級', source: '來源',
   releaseDate: '上市日期', period: '期別', memberId: '成員', score: '分數', ownedItems: '擁有項目',
-  selectedItems: '參賽項目'
+  selectedItems: '參賽項目', ingredients: '食材'
 };
 
+// 試算表欄位順序：id、原有欄位、稽核欄、上線後才加的欄位
+function dataCols_(type) {
+  const keys = function (added) {
+    return FIELDS[type].filter(function (f) { return !f.added === !added; }).map(function (f) { return f.k; });
+  };
+  return ['id'].concat(keys(false), AUDIT, keys(true));
+}
+
 const COLS = {
-  members: ['id'].concat(FIELDS.members.map(function (f) { return f.k; }), AUDIT),
-  items: ['id'].concat(FIELDS.items.map(function (f) { return f.k; }), AUDIT),
-  competitions: ['id'].concat(FIELDS.competitions.map(function (f) { return f.k; }), AUDIT),
+  members: dataCols_('members'),
+  items: dataCols_('items'),
+  competitions: dataCols_('competitions'),
   guilds: ['guild'].concat(AUDIT),
   users: ['username', 'passwordHash', 'salt', 'role', 'token', 'createdAt']
 };
@@ -82,7 +92,7 @@ const SEED_ITEMS = [
   { category: '時裝', name: '綺幻星語', source: '版本更新', note: '陸版 1.1.40（2026-09-11）新增；台版上市日期待確認' },
   { category: '時裝', name: '淺雪織冬', source: '時裝禮包', note: '陸版 1.1.55 限時禮包（2026-09-28～10-11）；台版日期待確認' },
   { category: '作物', name: '紫蘇', source: '版本更新', note: '陸版 1.1.12（2026-07-05）新增；台版上市日期待確認' },
-  { category: '食材', name: '陽江黑豆', source: '商店', note: '陸版 1.1.15（2026-07-20）商店上新；台版日期待確認' }
+  { category: '作物', name: '陽江黑豆', source: '商店', note: '陸版 1.1.15（2026-07-20）商店上新；台版日期待確認' }
 ];
 
 // ---------- 共用 ----------

@@ -28,7 +28,7 @@ function categoryRank(cat) {
 }
 function byCategoryThenName(a, b) { return (categoryRank(a.category) - categoryRank(b.category)) || byText(a.name, b.name); }
 
-// 勾選清單用的選項（成員擁有、競賽參賽共用）
+// 成員表單「擁有的圖鑑項目」勾選清單的選項
 function itemChecklistOptions(items) {
     return (items || state.items).slice().sort(byCategoryThenName)
         .map(i => ({ value: i.id, label: i.name, group: i.category, sub: i.rarity }));
@@ -58,7 +58,7 @@ function filteredItems() {
     const sort = ITEM_SORTS[$('items-sort').value] || byCategoryThenName;
     return state.items
         .filter(i => !state.itemCategory || i.category === state.itemCategory)
-        .filter(i => !q || [i.name, i.source, i.note, i.rarity].some(v => v.toLowerCase().includes(q)))
+        .filter(i => !q || [i.name, i.source, i.ingredients, i.note, i.rarity].some(v => (v || '').toLowerCase().includes(q)))
         .sort(sort);
 }
 
@@ -69,7 +69,6 @@ function renderItems() {
         return;
     }
     $('items-table').innerHTML = list.map(i => {
-        const n = itemOwners(i.id).length;
         const ownersBtn = isManager()
             ? `<button class="icon-btn" data-act="item-owners" data-id="${esc(i.id)}" title="設定誰擁有" aria-label="設定誰擁有">👥</button>`
             : '';
@@ -80,7 +79,7 @@ function renderItems() {
             <td>${esc(i.unlockLevel)}</td>
             <td>${esc(i.source)}</td>
             <td>${esc(i.releaseDate)}</td>
-            <td class="center"><span class="count-pill${n ? '' : ' is-empty'}" data-act="item-detail" data-id="${esc(i.id)}">${n} 人</span></td>
+            <td title="${esc(i.ingredients)}">${esc(i.ingredients)}</td>
             <td title="${esc(i.note)}">${esc(i.note)}</td>
             <td class="actions">${actionButtons('item', i, ownersBtn)}</td>
         </tr>`;
@@ -112,6 +111,7 @@ ACTIONS['item-detail'] = id => {
         ${detailRow('解鎖等級', i.unlockLevel)}
         ${detailRow('來源', i.source)}
         ${detailRow('上市日期', i.releaseDate)}
+        ${detailRow('食材', i.ingredients)}
         ${detailRow('備註', i.note)}
         ${detailRow('建立者', i.ownerId)}
         ${detailRow('最後更新', i.updatedAt ? formatTime(i.updatedAt) + '（' + i.updatedBy + '）' : '')}
@@ -125,11 +125,6 @@ function sourceSelectHtml(current) {
     const opt = (value, label) => `<option value="${esc(value)}" ${value === (current || '') ? 'selected' : ''}>${esc(label)}</option>`;
     const legacy = current && !SOURCES.includes(current) ? opt(current, current + '（舊選項）') : '';
     return `<select name="source">${opt('', '未填')}${SOURCES.map(s => opt(s, s)).join('')}${legacy}</select>`;
-}
-
-function datalistHtml(id, values) {
-    const uniq = Array.from(new Set(values.filter(Boolean))).sort(byText);
-    return `<datalist id="${id}">${uniq.map(v => `<option value="${esc(v)}">`).join('')}</datalist>`;
 }
 
 function openItemForm(i) {
@@ -152,6 +147,8 @@ function openItemForm(i) {
                     ${sourceSelectHtml(i ? i.source : '')}</div>
                 <div class="field"><label>上市日期（台版）</label>
                     <input type="date" name="releaseDate" value="${esc(i ? i.releaseDate : '')}"></div>
+                <div class="field"><label>食材</label>
+                    <input type="text" name="ingredients" maxlength="200" value="${esc(i ? i.ingredients : '')}"></div>
                 <div class="field full"><label>備註</label>
                     <textarea name="note" maxlength="300" placeholder="取得方式、用途、配方…">${esc(i ? i.note : '')}</textarea></div>
             </div>
@@ -174,7 +171,7 @@ FORMS.item = async form => {
     const id = form.dataset.id;
     const item = {
         category: v.category, name: v.name.trim(), rarity: (v.rarity || '').trim(), unlockLevel: v.unlockLevel.trim(),
-        source: v.source.trim(), releaseDate: v.releaseDate, note: v.note.trim()
+        source: v.source.trim(), releaseDate: v.releaseDate, ingredients: v.ingredients.trim(), note: v.note.trim()
     };
     const r = await apiCall({ action: id ? 'updateItem' : 'addItem', type: 'items', id, item }, '儲存失敗');
     if (!r) return;

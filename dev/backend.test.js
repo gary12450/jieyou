@@ -97,6 +97,29 @@ test('會員可新增圖鑑；同類別同名稱不可重複', () => {
   assert.ok(t.post({ action: 'addItem', token: a, type: 'items', item: { category: '料理', name: '測試番茄' } }).success);
 });
 
+test('圖鑑「食材」欄接在稽核欄後面，舊資料欄位位置不變', () => {
+  const t = boot();
+  const header = t.db.sheets.items[0];
+  assert.deepEqual(header.slice(0, 15), ['id', 'category', 'name', 'rarity', 'unlockLevel', 'source', 'releaseDate', 'note',
+    'ownerId', 'createdAt', 'updatedAt', 'updatedBy', 'deletedAt', 'deletedBy', 'ingredients']);
+
+  // 改版前寫入的列沒有食材欄：照樣讀得到，食材為空
+  const before = t.get().items[0];
+  assert.equal(before.ingredients, '');
+  t.db.sheets.items[1] = t.db.sheets.items[1].slice(0, 14);
+  assert.equal(t.get().items.find(x => x.id === before.id).ingredients, '');
+
+  const a = t.register('testA', 'test1234');
+  const r = t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試稻米', ingredients: '測試食材' } });
+  assert.ok(r.success, r.error);
+  assert.equal(r.record.ingredients, '測試食材');
+  const row = t.db.sheets.items.find(x => String(x[0]) === r.record.id);
+  assert.equal(row[14], '測試食材');
+  assert.equal(row[8], 'testA');
+  assert.equal(t.get().items.find(x => x.id === r.record.id).ingredients, '測試食材');
+  assert.match(t.post({ action: 'addItem', token: a, type: 'items', item: { category: '作物', name: '測試二', ingredients: 'x'.repeat(201) } }).error, /食材最多 200 字/);
+});
+
 test('遊戲ID 不可重複、公會必須存在', () => {
   const t = boot();
   const a = t.register('testA', 'test1234');

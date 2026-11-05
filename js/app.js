@@ -3,12 +3,11 @@
 const TABS = ['members', 'items', 'competitions'];
 
 function renderSummary() {
-    const thisPeriod = currentPeriod();
-    const n = state.competitions.filter(c => c.period === thisPeriod).length;
+    const n = state.items.filter(i => COMP_RARITIES.includes(i.rarity)).length;
     $('summary-bar').innerHTML = [
         `👥 ${state.members.length} 位成員`,
         `📖 ${state.items.length} 筆圖鑑`,
-        `🏆 本週 ${n} 筆競賽`,
+        `🏆 紅金紫 ${n} 項`,
         `🏝️ ${state.guilds.length} 個公會`
     ].map(s => `<span>${s}</span>`).join('<span>·</span>');
 }
@@ -36,10 +35,7 @@ function switchTab(tab) {
 ACTIONS.tab = tab => switchTab(tab);
 INPUTS.members = () => renderMembers();
 INPUTS.items = () => renderItems();
-INPUTS.competitions = el => {
-    if (el.id === 'comp-period') state.compPeriod = el.value;
-    renderCompetitions();
-};
+INPUTS.competitions = () => renderCompetitions();
 
 async function loadData() {
     let error = null;

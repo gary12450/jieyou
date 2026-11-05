@@ -6,7 +6,7 @@
     <title>海邊走走 — 解憂夢幻島</title>
     <meta name="description" content="海邊走走公會（解憂夢幻島）成員、圖鑑與公會競賽登記">
     <link rel="icon" type="image/svg+xml" href="assets/icon-small.svg">
-    <link rel="stylesheet" href="css/style.css?v=20261101">
+    <link rel="stylesheet" href="css/style.css?v=20261105">
 </head>
 <body>
 <div class="container">
@@ -76,7 +76,7 @@
         <div class="toolbar">
             <div class="search-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="search" id="items-search" class="search-input" placeholder="搜尋名稱、來源、備註…" data-input="items">
+                <input type="search" id="items-search" class="search-input" placeholder="搜尋名稱、來源、食材、備註…" data-input="items">
             </div>
             <select id="items-sort" class="select" data-change="items">
                 <option value="category">依類別排序</option>
@@ -97,7 +97,7 @@
                         <th>解鎖等級</th>
                         <th>來源</th>
                         <th>上市日期</th>
-                        <th class="center">誰擁有</th>
+                        <th>食材</th>
                         <th>備註</th>
                         <th class="center">操作</th>
                     </tr>
@@ -107,28 +107,24 @@
         </div></div>
     </section>
 
-    <!-- 公會競賽 -->
+    <!-- 公會競賽：依成員勾選的擁有項目自動統計紅金紫品項 -->
     <section id="tab-competitions" class="content">
+        <div id="comp-rarities" class="chip-row"></div>
         <div class="toolbar">
-            <select id="comp-period" class="select" data-change="competitions" aria-label="期別"></select>
             <select id="comp-guild" class="select" data-change="competitions" aria-label="公會"></select>
             <div class="search-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="search" id="comp-search" class="search-input" placeholder="搜尋成員或參賽項目…" data-input="competitions">
+                <input type="search" id="comp-search" class="search-input" placeholder="搜尋品項或成員…" data-input="competitions">
             </div>
-            <button class="btn btn-primary" data-act="comp-add">＋ 登記競賽</button>
         </div>
+        <div class="hint comp-hint">依「成員清單」每位成員勾選的擁有項目自動統計，不用另外登記。</div>
         <div class="table-card"><div class="table-scroll">
             <table>
                 <thead>
                     <tr>
-                        <th>期別</th>
-                        <th>成員</th>
-                        <th>公會</th>
-                        <th>參賽項目</th>
-                        <th class="num">分數</th>
-                        <th>備註</th>
-                        <th class="center">操作</th>
+                        <th>品項</th>
+                        <th class="center">人數</th>
+                        <th>人名</th>
                     </tr>
                 </thead>
                 <tbody id="competitions-table"></tbody>
@@ -164,12 +160,12 @@
 </div>
 
 <!-- ?v＝版本號：改了 css/js 就一起換新，避免瀏覽器混用新舊快取 -->
-<script src="js/config.js?v=20261101"></script>
-<script src="js/core.js?v=20261101"></script>
-<script src="js/auth.js?v=20261101"></script>
-<script src="js/members.js?v=20261101"></script>
-<script src="js/items.js?v=20261101"></script>
-<script src="js/competitions.js?v=20261101"></script>
-<script src="js/app.js?v=20261101"></script>
+<script src="js/config.js?v=20261105"></script>
+<script src="js/core.js?v=20261105"></script>
+<script src="js/auth.js?v=20261105"></script>
+<script src="js/members.js?v=20261105"></script>
+<script src="js/items.js?v=20261105"></script>
+<script src="js/competitions.js?v=20261105"></script>
+<script src="js/app.js?v=20261105"></script>
 </body>
 </html>

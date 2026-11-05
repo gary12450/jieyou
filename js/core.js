@@ -1,9 +1,9 @@
 // 共用：全域狀態、事件登記表、跳脫、對話框、loading、Modal、API、勾選清單
 
 const state = {
-    members: [], items: [], competitions: [], guilds: [],
+    members: [], items: [], guilds: [],
     memberMap: new Map(), itemMap: new Map(),
-    tab: 'members', itemCategory: '', compPeriod: null
+    tab: 'members', itemCategory: '', compRarity: ''
 };
 
 // 事件委派登記表：HTML 用 data-act / data-form / data-input / data-change 指名，由 app.js 統一分派
@@ -31,17 +31,6 @@ function categoriesInUse() {
     return names;
 }
 
-// 期別預設用 ISO 週：「2026年第44週」（週數補零，排序才正確）
-function currentPeriod() {
-    const now = new Date();
-    const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-    const day = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - day);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-    return d.getUTCFullYear() + '年第' + String(week).padStart(2, '0') + '週';
-}
-
 function formatTime(iso) {
     if (!iso) return '';
     const d = new Date(iso);
@@ -52,7 +41,8 @@ function formatTime(iso) {
 
 // ---------- 資料狀態 ----------
 
-const LIST_FIELDS = { members: ['ownedItems'], items: [], competitions: ['selectedItems'] };
+// 後端仍會回傳 competitions（舊的手動登記競賽），前端改成自動統計後不再使用
+const LIST_FIELDS = { members: ['ownedItems'], items: [] };
 
 // 後端回傳的資料補齊型別：id 一律字串、清單一律字串陣列、其他欄位缺值補空字串
 function normRecord(type, rec) {
@@ -68,7 +58,7 @@ function rebuildMaps() {
 }
 
 function setData(data) {
-    ['members', 'items', 'competitions'].forEach(t => { state[t] = (data[t] || []).map(r => normRecord(t, r)); });
+    ['members', 'items'].forEach(t => { state[t] = (data[t] || []).map(r => normRecord(t, r)); });
     state.guilds = Array.isArray(data.guilds) ? data.guilds.map(String) : [];
     rebuildMaps();
 }

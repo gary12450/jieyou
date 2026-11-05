@@ -18,7 +18,6 @@ const CATEGORIES = [
     { name: '作物', icon: '🌱' },
     { name: '養殖', icon: '🐔' },
     { name: '海產', icon: '🐟' },
-    { name: '食材', icon: '🧺' },
     { name: '料理', icon: '🍲' },
     { name: '裝飾', icon: '🏡' },
     { name: '其他', icon: '📦' }
@@ -32,6 +31,9 @@ const RARITIES = [
     { name: '華品', short: '華', color: '#f4a93a' },
     { name: '仙品', short: '仙', color: '#e04443' }
 ];
+
+// 「公會競賽」分頁統計的稀有度（紅、金、紫），順序＝顯示順序
+const COMP_RARITIES = ['仙品', '華品', '珍品'];
 
 // 圖鑑「來源」的選項（下拉選單，順序＝選單順序）。改這裡不會動到舊資料，舊值編輯時會保留
 const SOURCES = ['等級解鎖', '活動', '食坊兌換', '食靈商店', '每週食材', 'VIP商店', '食靈禮包', '食材禮包', '時裝禮包', '食之密令', '累計儲值'];

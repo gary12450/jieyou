@@ -63,7 +63,6 @@ ACTIONS['member-detail'] = id => {
     const m = state.memberMap.get(id);
     if (!m) return;
     const owned = ownedItemsOf(m);
-    const comps = state.competitions.filter(c => c.memberId === m.id).length;
     const editBtns = canEdit(m.ownerId)
         ? `<div class="modal-actions">
                <button class="btn btn-ghost" data-act="member-edit" data-id="${esc(m.id)}">✏️ 編輯</button>
@@ -74,7 +73,6 @@ ACTIONS['member-detail'] = id => {
         <div class="modal-header"><div class="modal-subtitle">${esc(m.guild || '未填公會')}</div><div class="modal-title">${esc(m.gameName)}</div></div>
         ${detailRow('遊戲ID', m.gameId)}
         ${detailRow('島嶼等級', m.islandLevel)}
-        ${detailRow('競賽紀錄', comps + ' 筆')}
         ${detailRow('備註', m.note)}
         ${detailRow('建立者', m.ownerId)}
         ${detailRow('最後更新', m.updatedAt ? formatTime(m.updatedAt) + '（' + m.updatedBy + '）' : '')}
@@ -147,9 +145,7 @@ FORMS.member = async form => {
 ACTIONS['member-delete'] = async id => {
     const m = state.memberMap.get(id);
     if (!m) return;
-    const comps = state.competitions.filter(c => c.memberId === m.id).length;
-    const extra = comps ? `\n他的 ${comps} 筆競賽紀錄會保留，成員欄會顯示「已刪除成員」。` : '';
-    if (!(await confirmBox(`確定要刪除成員「${m.gameName}」嗎？${extra}`, '刪除'))) return;
+    if (!(await confirmBox(`確定要刪除成員「${m.gameName}」嗎？`, '刪除'))) return;
     if (!(await apiCall({ action: 'deleteItem', type: 'members', id }, '刪除失敗'))) return;
     removeRecord('members', id);
     closeModal();

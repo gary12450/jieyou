@@ -155,6 +155,15 @@ tbody tr:hover { background: #fbf7ee; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 13px; background: #fff; border: 1px solid var(--line); }
 .tag.missing { color: #a3aeb3; border-style: dashed; }
+
+/* 公會競賽：紅金紫統計表 */
+.comp-hint { font-size: 13px; color: var(--muted); margin: -4px 0 10px; }
+.chip .rarity { font-size: 13px; gap: 4px; }
+.chip .rarity-dot { width: 18px; height: 18px; font-size: 11px; }
+.chip.active .rarity { color: #fff; }
+.group-row td { background: #faf6ec; height: 44px; }
+.group-row small { margin-left: 8px; color: var(--muted); font-size: 13px; }
+td.comp-names { white-space: normal; max-width: none; padding-top: 6px; padding-bottom: 6px; }
 td .tags { flex-wrap: nowrap; overflow: hidden; }
 
 /* ---------- 公會管理區 ---------- */
