@@ -75,6 +75,7 @@ h1 .h1-game { font-size: .6em; font-weight: 700; letter-spacing: 1px; color: var
     padding: 11px 22px; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: 600;
     color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap;
 }
+.tab-icon { margin-right: 6px; }
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--sea-dark); border-bottom-color: var(--sea); }
 
@@ -164,6 +165,12 @@ tbody tr:hover { background: #fbf7ee; }
 .group-row td { background: #faf6ec; height: 44px; }
 .group-row small { margin-left: 8px; color: var(--muted); font-size: 13px; }
 td.comp-names { white-space: normal; max-width: none; padding-top: 6px; padding-bottom: 6px; }
+
+/* 成員比對：有／沒有 */
+.compare-vs { font-weight: 700; color: var(--muted); }
+.own { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.own.yes { background: var(--sea-soft); color: var(--leaf-dark); }
+.own.no { background: #f4f1ea; color: #a3aeb3; }
 td .tags { flex-wrap: nowrap; overflow: hidden; }
 
 /* ---------- 公會管理區 ---------- */
@@ -276,7 +283,10 @@ footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: cen
     body { padding: 12px 16px; }
     h1 { font-size: 24px; }
     .brand-icon { width: 40px; height: 40px; }
-    .tab { padding: 10px 14px; font-size: 15px; }
+    /* 四個分頁在手機上排不下一列：改成圖示在上、文字在下，平均分配寬度 */
+    .tabs { gap: 0; }
+    .tab { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; font-size: 14px; }
+    .tab-icon { margin-right: 0; font-size: 18px; line-height: 1.2; }
     td { max-width: none; }
     .form-grid { grid-template-columns: 1fr; }
     .toolbar .btn-primary { flex: 1 1 100%; }

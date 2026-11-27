@@ -6,7 +6,7 @@
     <title>海邊走走 — 解憂夢幻島</title>
     <meta name="description" content="海邊走走公會（解憂夢幻島）成員、圖鑑與公會競賽登記">
     <link rel="icon" type="image/svg+xml" href="assets/icon-small.svg">
-    <link rel="stylesheet" href="css/style.css?v=20261105b">
+    <link rel="stylesheet" href="css/style.css?v=20261127">
 </head>
 <body>
 <div class="container">
@@ -25,9 +25,10 @@
     <div id="config-notice" class="notice hidden"></div>
 
     <nav class="tabs" role="tablist">
-        <button class="tab active" data-act="tab" data-id="members" role="tab">👥 成員清單</button>
-        <button class="tab" data-act="tab" data-id="items" role="tab">📖 圖鑑</button>
-        <button class="tab" data-act="tab" data-id="competitions" role="tab">🏆 公會競賽</button>
+        <button class="tab active" data-act="tab" data-id="members" role="tab"><span class="tab-icon">👥</span>成員清單</button>
+        <button class="tab" data-act="tab" data-id="items" role="tab"><span class="tab-icon">📖</span>圖鑑</button>
+        <button class="tab" data-act="tab" data-id="competitions" role="tab"><span class="tab-icon">🏆</span>公會競賽</button>
+        <button class="tab" data-act="tab" data-id="compare" role="tab"><span class="tab-icon">🔍</span>成員比對</button>
     </nav>
 
     <div id="summary-bar" class="summary-bar"></div>
@@ -135,6 +136,37 @@
         </div></div>
     </section>
 
+    <!-- 成員比對：選兩位成員，看同一個項目誰有、誰沒有 -->
+    <section id="tab-compare" class="content">
+        <div class="toolbar">
+            <select id="compare-a" class="select" data-change="compare-member" aria-label="成員一"></select>
+            <span class="compare-vs">vs</span>
+            <select id="compare-b" class="select" data-change="compare-member" aria-label="成員二"></select>
+        </div>
+        <div class="toolbar">
+            <select id="compare-cat" class="select" data-change="compare" aria-label="類別"></select>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="compare-search" class="search-input" placeholder="搜尋項目名稱…" data-input="compare">
+            </div>
+        </div>
+        <div id="compare-modes" class="chip-row"></div>
+        <div class="table-card"><div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th class="center" id="compare-head-a">成員一</th>
+                        <th class="center" id="compare-head-b">成員二</th>
+                        <th>稀有度</th>
+                        <th>類別</th>
+                    </tr>
+                </thead>
+                <tbody id="compare-table"></tbody>
+            </table>
+        </div></div>
+    </section>
+
     <footer>
         資料由公會成員自行建立與維護・遊戲內容以遊戲內實際顯示為準<br>
         本站為玩家自製，與遊戲官方無關
@@ -163,12 +195,13 @@
 </div>
 
 <!-- ?v＝版本號：改了 css/js 就一起換新，避免瀏覽器混用新舊快取 -->
-<script src="js/config.js?v=20261105b"></script>
-<script src="js/core.js?v=20261105b"></script>
-<script src="js/auth.js?v=20261105b"></script>
-<script src="js/members.js?v=20261105b"></script>
-<script src="js/items.js?v=20261105b"></script>
-<script src="js/competitions.js?v=20261105b"></script>
-<script src="js/app.js?v=20261105b"></script>
+<script src="js/config.js?v=20261127"></script>
+<script src="js/core.js?v=20261127"></script>
+<script src="js/auth.js?v=20261127"></script>
+<script src="js/members.js?v=20261127"></script>
+<script src="js/items.js?v=20261127"></script>
+<script src="js/competitions.js?v=20261127"></script>
+<script src="js/compare.js?v=20261127"></script>
+<script src="js/app.js?v=20261127"></script>
 </body>
 </html>

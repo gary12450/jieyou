@@ -1,6 +1,6 @@
 // 進入點：載入資料、分頁切換、摘要列、事件委派
 
-const TABS = ['members', 'items', 'competitions'];
+const TABS = ['members', 'items', 'competitions', 'compare'];
 
 function renderSummary() {
     const n = state.items.filter(i => COMP_RARITIES.includes(i.rarity)).length;
@@ -22,6 +22,8 @@ function renderAll() {
     renderItems();
     renderCompFilters();
     renderCompetitions();
+    renderCompareFilters();
+    renderCompare();
 }
 
 function switchTab(tab) {
@@ -36,6 +38,7 @@ ACTIONS.tab = tab => switchTab(tab);
 INPUTS.members = () => renderMembers();
 INPUTS.items = () => renderItems();
 INPUTS.competitions = () => renderCompetitions();
+INPUTS.compare = () => renderCompare();
 
 async function loadData() {
     let error = null;

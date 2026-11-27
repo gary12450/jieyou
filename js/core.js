@@ -3,7 +3,8 @@
 const state = {
     members: [], items: [], guilds: [],
     memberMap: new Map(), itemMap: new Map(),
-    tab: 'members', itemCategory: '', compRarity: ''
+    tab: 'members', itemCategory: '', compRarity: '',
+    compareA: '', compareB: '', compareMode: 'any'
 };
 
 // 事件委派登記表：HTML 用 data-act / data-form / data-input / data-change 指名，由 app.js 統一分派
